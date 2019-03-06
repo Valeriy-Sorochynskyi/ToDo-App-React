@@ -1,5 +1,5 @@
-- * [Prewiev] (https://valeriy-sorochynskyi.github.io/todo-app-react/)
-- * [Pull] (https://github.com/Valeriy-Sorochynskyi/todo-app-react/pull/2/files)
+- [Prewiev](https://valeriy-sorochynskyi.github.io/todo-app-react/)
+- [Pull](https://github.com/Valeriy-Sorochynskyi/todo-app-react/pull/2/files)
 
 # ToDo-App-React
 
