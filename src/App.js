@@ -72,18 +72,21 @@ class ToDoList extends React.Component {
   state = {
     items: [],
     newItemText: "",
-    checkedAll: false
+    checkedAll: false,
+    sortBy: ""
   };
 
-  toggleItem = item => {
+  toggleItem = id => {
     this.setState(({ items }) => {
-      const index = items.indexOf(item);
-      const newItems = [...items];
-
-      newItems[index] = {
-        ...item,
-        done: !item.done
-      };
+      const newItems = items.map(item => {
+        if (item.id === id) {
+          return {
+            ...item,
+            done: !item.done
+          };
+        }
+        return item;
+      });
 
       return {
         items: newItems
@@ -91,14 +94,17 @@ class ToDoList extends React.Component {
     });
   };
 
-  changeText = (item, text) => {
+  changeText = (id, text) => {
     this.setState(({ items }) => {
-      const index = items.indexOf(item);
-      const newItems = [...items];
-      newItems[index] = {
-        ...item,
-        text
-      };
+      const newItems = items.map(item => {
+        if (item.id === id) {
+          return {
+            ...item,
+            text
+          };
+        }
+        return item;
+      });
 
       return {
         items: newItems
@@ -106,17 +112,17 @@ class ToDoList extends React.Component {
     });
   };
 
-  handleDelete = item => {
+  handleDelete = id => {
     this.setState(({ items }) => {
       return {
-        items: items.filter(current => current !== item)
+        items: items.filter(current => current.id !== id)
       };
     });
   };
 
   addItem = text => {
-    if (text===""){
-      return
+    if (text === "") {
+      return;
     }
     this.setState(({ items }) => {
       const newItem = {
@@ -165,25 +171,49 @@ class ToDoList extends React.Component {
     });
   };
 
-  handleOnActive = () => {
-    this.setState(({items}) => {
+  handleOnAll = () => {
+    this.setState(prevState => {
       return {
-        items: items.filter(item => !item.done)
-      }
-    })
-  }
+        ...prevState,
+        sortBy: "all"
+      };
+    });
+  };
+
+  handleOnActive = () => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        sortBy: "active"
+      };
+    });
+  };
 
   handleOnCompleted = () => {
-    this.setState(({items, completedItems}) => {
+    this.setState(prevState => {
       return {
-        items: items.filter(item => item.done)
-      }
-    })
-  }
+        ...prevState,
+        sortBy: "done"
+      };
+    });
+  };
+
+  filterItems = ({ items, sortBy }) => {
+    switch (sortBy) {
+      case "all":
+        return items;
+      case "done":
+        return items.filter(item => item.done);
+      case "active":
+        return items.filter(item => !item.done);
+      default:
+        return items;
+    }
+  };
 
   render() {
     const activeItems = this.state.items.filter(item => !item.done);
-
+    const items = this.filterItems(this.state);
     return (
       <section className="todoapp">
         <header className="header">
@@ -208,15 +238,15 @@ class ToDoList extends React.Component {
           />
           <label htmlFor="toggle-all">Mark all as complete</label>
           <ul className="todo-list">
-            {this.state.items.map(item => (
+            {items.map(item => (
               <ToDo
                 key={item.id}
                 id={item.id}
                 text={item.text}
                 done={item.done}
-                onChange={() => this.toggleItem(item)}
-                onDelete={() => this.handleDelete(item)}
-                onTextChanged={text => this.changeText(item, text)}
+                onChange={() => this.toggleItem(item.id)}
+                onDelete={() => this.handleDelete(item.id)}
+                onTextChanged={text => this.changeText(item.id, text)}
               />
             ))}
           </ul>
@@ -226,10 +256,11 @@ class ToDoList extends React.Component {
           <span className="todo-count">
             <strong>{activeItems.length}</strong> item left
           </span>
-              <Filters 
-              onActive={this.handleOnActive} 
-              onCompleted={this.handleOnCompleted}
-              />
+          <Filters
+            onAll={this.handleOnAll}
+            onActive={this.handleOnActive}
+            onCompleted={this.handleOnCompleted}
+          />
           <button onClick={this.clearCompleted} className="clear-completed">
             Clear completed
           </button>
@@ -239,28 +270,27 @@ class ToDoList extends React.Component {
   }
 }
 
-class Filters extends React.Component {
-  state = {
-    isSelected: false
-  }
-  render() {
-    return (
-      <ul className="filters">
-        <li>
-          <a href="#/" className="selected">
-            All
-          </a>
-        </li>
-        <li>
-          <a onClick={this.props.onActive} href="#/active">Active</a>
-        </li>
-        <li>
-          <a onClick={this.props.onCompleted} href="#/completed">Completed</a>
-        </li>
-      </ul>
-    );
-  }
-}
+const Filters = ({ onAll, onActive, onCompleted }) => {
+  return (
+    <ul className="filters">
+      <li>
+        <a onClick={onAll} href="#/" className="selected">
+          All
+        </a>
+      </li>
+      <li>
+        <a onClick={onActive} href="#/active" className="selected">
+          Active
+        </a>
+      </li>
+      <li>
+        <a onClick={onCompleted} href="#/completed" className="selected">
+          Completed
+        </a>
+      </li>
+    </ul>
+  );
+};
 
 const App = () => (
   <div className="App">
