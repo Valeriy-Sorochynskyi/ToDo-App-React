@@ -1,3 +1,6 @@
+- [Prewiev](https://valeriy-sorochynskyi.github.io/todo-app-react/)
+- [Pull](https://github.com/Valeriy-Sorochynskyi/todo-app-react/pull/2/files)
+
 # ToDo-App-React
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
